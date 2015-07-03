@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Site watchcher</title>
+    <script src="bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
+    <script src="bower_components/materialize/dist/js/materialize.min.js" charset="utf-8"></script>
+
+    <!-- CSS  -->
+    <link href="bower_components/materialize/dist/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="index.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+  <body>
+    <div class="row center">
+      <div class="col s4">
+          <span class='timeout-interval-text'>Refresh interval in seconds: </span>
+      </div>
+      <div class="col s8">
+          <p class="range-field">
+            <input type="range" id="timeout-interval" min="0" max="500" />
+          </p>
+      </div>
+    </div>
+
+    <div class="row center">
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x1-y1'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x2-y1'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x3-y1'><i class="fa fa-plus"></i></a>
+      </div>
+    </div>
+
+    <div class="row center">
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x1-y2'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x2-y2'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x3-y2'><i class="fa fa-plus"></i></a>
+      </div>
+    </div>
+
+    <div class="row center">
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x1-y3'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x2-y3'><i class="fa fa-plus"></i></a>
+      </div>
+
+      <div class="col s4">
+        <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" pos='x3-y3'><i class="fa fa-plus"></i></a>
+      </div>
+    </div>
+
+
+    <div class="card medium view-card" id='proto-card'>
+      <div class="card-content">
+        <iframe></iframe>
+        <span class="card-title activator grey-text text-darken-4">Set a url to show</i></span>
+        <a class="waves-effect waves-light btn right grey close-view-btn" pos=''><i class="fa fa-times"></i></a>
+      </div>
+      <div class="card-reveal">
+        <span class="card-title grey-text text-darken-4">Set content URL</i></span>
+        <input placeholder="www.some-content.now" class="data_url_input" type="text">
+        <a class="waves-effect waves-light btn change-data-btn" target=''>Change</a>
+      </div>
+    </div>
+    <a class="btn-floating btn-large waves-effect waves-light grey add-view-button" id='proto-btn' pos=''><i class="fa fa-plus"></i></a>
+  </body>
+
+  <script type="text/javascript">
+
+    var site_viewer = site_viewer || {};
+    site_viewer.sampleURLs = [
+      'http://www.bbc.com',
+      'http://www.cnn.com',
+      'http://www.time.com',
+      'http://www.techcrunch.com',
+      'http://www.reuters.com',
+      'http://www.aljazeera.com',
+      'http://www.rt.com'
+    ];
+
+    $().ready(function () {
+      site_viewer.proto_card = $('#proto-card').clone();
+      site_viewer.proto_btn = $('#proto-btn').clone();
+      $('#proto-card').remove();
+      $('#proto-btn').remove();
+
+      $('#timeout-interval').val(60);
+
+      $('#btn-x1-y1').click(function () {
+        setNewContent($('#btn-x1-y1').attr('target'), $(this));
+      });
+
+      $('.add-view-button').click(function () {
+        addView($(this));
+      });
+    });
+
+
+    function setNewContent(iframeId, btn) {
+      var newUrl = btn.siblings('input').val();
+      $(iframeId).attr('src', newUrl);
+      $(iframeId).siblings('span').text(newUrl);
+      if($(iframeId).get(0).timeout != null) {
+        clearInterval($(iframeId).get(0).timeout);
+      }
+
+      $(iframeId).get(0).timeout = setInterval(function () {
+        $(iframeId).attr('src', $(iframeId).attr('src'));
+      }, parseInt($('#timeout-interval').val()) * 1000);
+
+      btn.siblings('span').click();
+    }
+
+    function addView(btn) {
+      var position = btn.attr('pos');
+      var newCard = site_viewer.proto_card.clone();
+      newCard.find('iframe').attr('id', 'iframe-' + position);
+      newCard.find('iframe').get(0).timeout = null;
+
+      newCard.find('.change-data-btn').attr('target', '#iframe-' + position);
+      newCard.find('.change-data-btn').click(function () {
+        setNewContent('#iframe-' + position, $(this));
+      });
+
+      newCard.find('.close-view-btn').attr('pos', position);
+      newCard.find('.close-view-btn').click(function () {
+        closeView($(this));
+      });
+
+      btn.parent().append(newCard);
+
+      // Set random page as proof of concept
+      var pageURL = site_viewer.sampleURLs[
+        Math.floor(Math.random() * site_viewer.sampleURLs.length)];
+
+      newCard.find('input').val(pageURL);
+      newCard.find('.change-data-btn').click();
+
+      btn.remove();
+    }
+
+    function closeView(btn) {
+      var position = btn.attr('pos');
+
+      var col = btn.parent().parent().parent();
+      // Clear timeout
+      if(col.find('.card iframe').get(0).timeout != null) {
+        clearInterval(col.find('.card iframe').get(0).timeout);
+      }
+
+      col.children().remove();
+
+      var newBtn = site_viewer.proto_btn.clone();
+      newBtn.attr('pos', position);
+      newBtn.click(function () {
+        addView($(this));
+      });
+      col.append(newBtn);
+    }
+  </script>
+</html>

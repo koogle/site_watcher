@@ -1,0 +1,18 @@
+.card.medium.view-card .card-content {
+    height: 100%;
+}
+
+.card.medium.view-card .card-content > iframe {
+  height: 90%;
+  width:  100%;
+}
+
+.add-view-button {
+  position: relative;
+  top: 10em;
+}
+
+.timeout-interval-text {
+  position: relative;
+  top: 1.5em;
+}
