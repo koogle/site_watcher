@@ -20,3 +20,11 @@
 .view-row {
   min-height: 15em;
 }
+
+.view-row .col {
+  padding: 0px;
+}
+
+.view-row .card .card-content {
+  padding: 0.5em;;
+}
